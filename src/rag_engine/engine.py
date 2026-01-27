@@ -2,13 +2,13 @@ import os
 from llama_index.core import VectorStoreIndex, Settings
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from llama_index.llms.gemini import Gemini
+from llama_index.llms.deepseek import DeepSeek
 import qdrant_client
 
 def initialize_settings():
-    api_key = os.getenv("GOOGLE_API_KEY")
-    # LLM (Google) para generar la respuesta
-    Settings.llm = Gemini(model="models/gemini-pro", api_key=api_key, temperature=0.1)
+    api_key = os.getenv("DEEPSEEK_API_KEY")
+    # LLM (DeepSeek) para generar la respuesta
+    Settings.llm = DeepSeek(model="deepseek-chat", api_key=api_key, temperature=0.1)
     # Embedding (Local) para buscar en el PDF
     Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
 

@@ -1,4 +1,5 @@
 llama-index-core
+llama-index-llms-deepseek
 llama-index-llms-gemini
 llama-index-embeddings-gemini
 llama-index-vector-stores-qdrant

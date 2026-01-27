@@ -8,10 +8,18 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 from src.rag_engine.engine import get_query_engine
 from src.evaluation.metrics import evaluate_response
 
-st.set_page_config(page_title="Oracle RAG - Gemini", layout="wide")
+st.set_page_config(page_title="DeepSeek R1 & Oracle Cloud", layout="wide")
 
-st.title("🤖 Enterprise RAG System")
-st.subheader("Powered by Oracle Cloud & Google Gemini")
+st.title("Enterprise RAG System")
+st.subheader("Powered by Oracle Cloud & DeepSeek R1")
+
+with st.sidebar:
+    st.header("Estado del Sistema")
+    st.success("Embeddings: BGE-Small (Local)")
+    if "query_engine" in st.session_state:
+        st.success("Qdrant: Conectado")
+    else:
+        st.warning("Qdrant: Desconectado")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -26,8 +34,16 @@ if "query_engine" not in st.session_state:
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
+        
+        # Mostrar fuentes si existen
+        if "sources" in message:
+            with st.expander("Fuentes Consultadas"):
+                for source in message["sources"]:
+                    st.markdown(f"**{source['file']}** (Relevance: {source['score']:.2f})")
+                    st.caption(f"...{source['text']}...")
+
         if "metrics" in message:
-            with st.expander("📊 Métricas de Calidad"):
+            with st.expander("Metricas de Calidad"):
                 col1, col2 = st.columns(2)
                 col1.metric("Fidelidad", message["metrics"]["faithfulness"])
                 col2.metric("Relevancia", message["metrics"]["answer_relevancy"])
@@ -43,8 +59,26 @@ if prompt := st.chat_input("Consulta a tus documentos..."):
                 response = st.session_state.query_engine.query(prompt)
                 metrics = evaluate_response(prompt, response)
                 
+                # Procesar fuentes
+                sources = []
+                if hasattr(response, 'source_nodes'):
+                    for node in response.source_nodes:
+                        sources.append({
+                            "file": node.metadata.get("file_name", "Unknown Document"),
+                            "score": node.score or 0.0,
+                            "text": node.get_text()[:200]
+                        })
+
                 st.markdown(response.response)
-                with st.expander("📊 Métricas de Calidad"):
+                
+                # Mostrar fuentes
+                if sources:
+                    with st.expander("Fuentes Consultadas"):
+                        for source in sources:
+                            st.markdown(f"**{source['file']}** (Relevance: {source['score']:.2f})")
+                            st.caption(f"...{source['text']}...")
+
+                with st.expander("Metricas de Calidad"):
                     col1, col2 = st.columns(2)
                     col1.metric("Fidelidad", metrics["faithfulness"])
                     col2.metric("Relevancia", metrics["answer_relevancy"])
@@ -52,7 +86,8 @@ if prompt := st.chat_input("Consulta a tus documentos..."):
                 st.session_state.messages.append({
                     "role": "assistant", 
                     "content": response.response,
-                    "metrics": metrics
+                    "metrics": metrics,
+                    "sources": sources
                 })
             except Exception as e:
                 st.error(f"Ocurrió un error: {e}")
