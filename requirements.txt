@@ -1,0 +1,14 @@
+llama-index-core
+llama-index-llms-gemini
+llama-index-embeddings-gemini
+llama-index-vector-stores-qdrant
+llama-index-embeddings-huggingface
+sentence-transformers
+qdrant-client
+ragas
+streamlit
+python-dotenv
+pandas
+nest-asyncio
+fastapi
+uvicorn
