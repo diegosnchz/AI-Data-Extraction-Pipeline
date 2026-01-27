@@ -11,15 +11,16 @@ def initialize_settings():
     if not api_key:
         raise ValueError("GOOGLE_API_KEY not found in environment variables")
     
-    # Configure Gemini Model
-    Settings.llm = Gemini(model_name="models/gemini-1.5-flash", api_key=api_key, temperature=0.1)
+    # Configure Gemini Model - CAMBIADO A GEMINI-PRO
+    Settings.llm = Gemini(model="models/gemini-pro", api_key=api_key, temperature=0.1)
     Settings.embed_model = GeminiEmbedding(model_name="models/embedding-001", api_key=api_key)
 
 def get_index():
     """Establishes connection to Qdrant and returns the VectorStoreIndex."""
     initialize_settings()
     
-    qdrant_url = os.getenv("QDRANT_URL")
+    # URL interna de Docker por defecto
+    qdrant_url = os.getenv("QDRANT_URL", "http://qdrant:6333")
     collection_name = os.getenv("QDRANT_COLLECTION_NAME", "rag_collection")
     
     print(f"🔌 Connecting to Qdrant at {qdrant_url}...")
