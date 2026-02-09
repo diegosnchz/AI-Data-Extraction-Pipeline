@@ -1,6 +1,7 @@
 import streamlit as st
 import sys
 import os
+import hmac
 
 # Añadir directorio raíz al path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
@@ -9,6 +10,33 @@ from src.rag_engine.engine import get_query_engine
 from src.evaluation.metrics import evaluate_response
 
 st.set_page_config(page_title="DeepSeek R1 & Oracle Cloud", layout="wide")
+
+def check_password():
+    """Returns `True` if the user had the correct password."""
+
+    def password_entered():
+        """Checks whether a password entered by the user is correct."""
+        if hmac.compare_digest(st.session_state["password"], st.secrets.get("APP_PASSWORD", os.getenv("APP_PASSWORD", ""))):
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]  # Don't store the password
+        else:
+            st.session_state["password_correct"] = False
+
+    # Password validation logic
+    if st.session_state.get("password_correct", False):
+        return True
+
+    st.text_input(
+        "Password", type="password", on_change=password_entered, key="password"
+    )
+    
+    if "password_correct" in st.session_state:
+        st.error("😕 Password incorrect")
+        
+    return False
+
+if not check_password():
+    st.stop()
 
 st.title("Enterprise RAG System")
 st.subheader("Powered by Oracle Cloud & DeepSeek R1")

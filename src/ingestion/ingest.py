@@ -10,7 +10,6 @@ load_dotenv()
 def ingest_documents():
     print("🚀 Iniciando ingesta con Embeddings Locales...")
     
-    api_key = os.getenv("GOOGLE_API_KEY")
     qdrant_url = os.getenv("QDRANT_URL", "http://qdrant:6333") 
     collection_name = os.getenv("QDRANT_COLLECTION_NAME", "rag_collection")
 

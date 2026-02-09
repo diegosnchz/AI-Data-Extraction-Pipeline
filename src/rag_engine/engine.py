@@ -7,6 +7,9 @@ import qdrant_client
 
 def initialize_settings():
     api_key = os.getenv("DEEPSEEK_API_KEY")
+    if not api_key:
+        raise ValueError("DEEPSEEK_API_KEY enviroment variable is not set. Please set it in your .env file.")
+
     # LLM (DeepSeek) para generar la respuesta
     Settings.llm = DeepSeek(model="deepseek-chat", api_key=api_key, temperature=0.1)
     # Embedding (Local) para buscar en el PDF
