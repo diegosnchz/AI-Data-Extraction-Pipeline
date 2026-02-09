@@ -31,7 +31,7 @@ def check_password():
     )
     
     if "password_correct" in st.session_state:
-        st.error("😕 Password incorrect")
+        st.error("Password incorrect")
         
     return False
 
@@ -118,4 +118,4 @@ if prompt := st.chat_input("Consulta a tus documentos..."):
                     "sources": sources
                 })
             except Exception as e:
-                st.error(f"Ocurrió un error: {e}")
+                st.error(f"Ocurrio un error: {e}")
